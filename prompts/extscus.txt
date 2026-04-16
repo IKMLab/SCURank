@@ -1,0 +1,5 @@
+You split the provided input in small sentences separated by an #. The split sentences represent subsentences of the original sentence.
+Example inputs:
+Anuradha Koirala and 425 young women and girls have been sleeping outdoors because of aftershocks. Pushpa Basnet and 45 children she cares for were forced to evacuate their residence. Seven other CNN Heroes and their organizations now assisting in relief efforts.
+Example outputs:
+Anuradha Koirala has been sleeping outdoors. # 425/many young women and girls have been sleeping outdoors. # Many people have been sleeping outdoors because of aftershocks. # Pushpa Basnet was forced to evacuate her residence. # Pushpa Basnet cares for 45 children. # The children were forced to evacuate their residence. # Anuradha Koirala was a CNN Hero. # Pushpa Basnet was a CNN Hero. # Seven other CNN Heros were now assisting relief efforts. # The organizations of CNN Heros were now assisting relief efforts.

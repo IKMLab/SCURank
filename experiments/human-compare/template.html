@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://assets.crowd.aws/crowd-html-elements.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #1a5490;
+            border-bottom: 3px solid #1a5490;
+            padding-bottom: 15px;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+        }
+
+        .section-header {
+            color: #1a5490;
+            font-size: 1.3em;
+            font-weight: 600;
+            border-left: 4px solid #1a5490;
+            padding-left: 15px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .overview-box {
+            background-color: #e8f4f8;
+            border-left: 5px solid #1a5490;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .overview-box h2 {
+            color: #1a5490;
+            margin-top: 0;
+            font-size: 1.1em;
+        }
+
+        .overview-box ul {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+
+        .overview-box li {
+            margin: 8px 0;
+        }
+
+        .article-section {
+            background-color: #f9f9f9;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .article-section p {
+            margin: 0;
+            line-height: 1.8;
+            font-size: 0.95em;
+        }
+
+        .summary-section {
+            background-color: #fafafa;
+            border: 2px solid #2196F3;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .summary-section.summary2 {
+            border-color: #4CAF50;
+        }
+
+        .summary-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1a5490;
+            margin-bottom: 12px;
+        }
+
+        .summary-text {
+            background-color: white;
+            padding: 15px;
+            border-radius: 4px;
+            line-height: 1.7;
+            font-size: 0.95em;
+        }
+
+        .evaluation-section {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .criteria-label {
+            font-size: 1em;
+            font-weight: 600;
+            color: #1a5490;
+            margin-bottom: 10px;
+        }
+
+        .criteria-description {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 15px;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        crowd-radio-group {
+            display: block;
+            margin: 15px 0;
+        }
+
+        crowd-radio-button {
+            display: block;
+            margin: 10px 0;
+            padding: 8px 0;
+        }
+
+        /* Ensure single selection for radio groups */
+        crowd-radio-button input[type="radio"] {
+            cursor: pointer;
+        }
+
+        .error-types {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .error-types strong {
+            color: #856404;
+        }
+
+        .error-types ul {
+            margin: 8px 0;
+            padding-left: 25px;
+        }
+
+        .error-types li {
+            margin: 5px 0;
+            color: #856404;
+        }
+
+        .comparison-section {
+            background-color: #e8f5e9;
+            border: 2px solid #4CAF50;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .comparison-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+
+        .comments-section {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .comments-title {
+            font-size: 1em;
+            font-weight: 600;
+            color: #1a5490;
+            margin-bottom: 10px;
+        }
+
+        crowd-text-area {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .step-indicator {
+            background-color: #e3f2fd;
+            color: #1a5490;
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        /* Custom Toggle Button Styles */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .toggle-button {
+            padding: 10px 14px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            font-size: 0.93em;
+            text-align: left;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-button:hover {
+            background-color: #f0f0f0;
+            border-color: #1a5490;
+        }
+
+        .toggle-button.selected {
+            background-color: #1a5490;
+            color: white;
+            border-color: #1a5490;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(26, 84, 144, 0.3);
+        }
+
+        .toggle-button-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #999;
+            border-radius: 3px;
+            background-color: white;
+            margin-right: 5px;
+            flex-shrink: 0;
+        }
+
+        .toggle-button.selected .toggle-button-indicator {
+            background-color: #1a5490;
+            border-color: #1a5490;
+        }
+
+        .toggle-button.selected .toggle-button-indicator::after {
+            content: "✓";
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .toggle-button-text {
+            flex: 1;
+        }
+
+        /* Parallel Layout Styles */
+        .article-section-full {
+            background-color: #f9f9f9;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+
+        .article-section-full p {
+            margin: 0;
+            line-height: 1.8;
+            font-size: 0.95em;
+        }
+
+        .parallel-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 25px 0;
+        }
+
+        .summary-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .summary-header {
+            background-color: #fafafa;
+            border: 2px solid #2196F3;
+            border-radius: 6px;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+
+        .summary-column:nth-child(2) .summary-header {
+            border-color: #4CAF50;
+        }
+
+        .summary-header-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1a5490;
+            margin-bottom: 12px;
+        }
+
+        .summary-header-text {
+            background-color: white;
+            padding: 15px;
+            border-radius: 4px;
+            line-height: 1.7;
+            font-size: 0.95em;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .evaluation-column {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+        }
+
+        .criteria-item {
+            margin-bottom: 25px;
+        }
+
+        .criteria-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .criteria-label-parallel {
+            font-size: 1em;
+            font-weight: 600;
+            color: #1a5490;
+            margin-bottom: 10px;
+        }
+
+        .criteria-description-parallel {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 15px;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .error-types-parallel {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .error-types-parallel strong {
+            color: #856404;
+        }
+
+        .error-types-parallel ul {
+            margin: 8px 0;
+            padding-left: 25px;
+        }
+
+        .error-types-parallel li {
+            margin: 5px 0;
+            color: #856404;
+        }
+
+        @media (max-width: 1600px) {
+            .parallel-section {
+                gap: 25px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .parallel-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <crowd-form answer-format="flatten-objects">
+        <div class="container">
+            <!-- Header -->
+            <h1>Summary Evaluation and Comparison Task</h1>
+
+            <!-- Overview -->
+            <div class="overview-box">
+                <h2>Task Overview</h2>
+                <p>You will be evaluating and comparing two different summaries of the same article. Your task is to assess the quality of each summary based on three key criteria, and then make an overall comparison between them.</p>
+
+                <h3 style="color: #1a5490; margin-top: 15px;">What You'll Do</h3>
+                <ul>
+                    <li>Read the original article carefully</li>
+                    <li>Read Summary 1 and evaluate it on three dimensions</li>
+                    <li>Read Summary 2 and evaluate it on three dimensions</li>
+                    <li>Compare the two summaries and indicate which is better overall</li>
+                </ul>
+            </div>
+
+            <!-- Evaluation Criteria Overview -->
+            <div class="section-header">Evaluation Criteria</div>
+            <p>You will rate each summary on:</p>
+            <ul>
+                <li><strong>Completeness:</strong> How well the summary captures the core messages and important information from the article</li>
+                <li><strong>Conciseness:</strong> How efficiently the summary conveys information without unnecessary details or redundancy</li>
+                <li><strong>Faithfulness:</strong> How accurate the summary is - whether it contains any errors, misrepresentations, or hallucinated information</li>
+            </ul>
+
+            <!-- STEP 1: Read the Article -->
+            <div class="step-indicator">STEP 1</div>
+            <div class="section-header">Read the Original Article</div>
+            <p>Please read the following article carefully. You may refer back to it at any time during the evaluation.</p>
+            <div class="article-section">
+                <p>${article}</p>
+            </div>
+
+            <!-- STEP 2: Evaluate Summaries (Side-by-Side) -->
+            <div class="step-indicator">STEP 2</div>
+            <div class="section-header">Summary Evaluation</div>
+            <p>Please rate each summary on the following three dimensions:</p>
+
+            <!-- Parallel Layout: Summaries and Evaluations Side-by-Side -->
+            <div class="parallel-section">
+                <!-- Summary 1 Column -->
+                <div class="summary-column">
+                    <div class="summary-header">
+                        <div class="summary-header-title">Summary 1</div>
+                        <div class="summary-header-text">${summary1}</div>
+                    </div>
+
+                    <div class="evaluation-column">
+                        <!-- Summary 1: Completeness -->
+                        <div class="criteria-item">
+                            <div class="criteria-label-parallel">1. Completeness</div>
+                            <div class="criteria-description-parallel">How well does this summary capture the core messages and important information from the article?</div>
+                            <div class="button-group" data-group="s1_completeness">
+                                <button type="button" class="toggle-button" data-value="5">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">5 - Excellent</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="4">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">4 - Good</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="3">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">3 - Adequate</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="2">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">2 - Poor</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="1">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">1 - Very Poor</span>
+                                </button>
+                            </div>
+                            <input type="hidden" name="s1_completeness" id="s1_completeness" value="">
+                        </div>
+
+                        <!-- Summary 1: Conciseness -->
+                        <div class="criteria-item">
+                            <div class="criteria-label-parallel">2. Conciseness</div>
+                            <div class="criteria-description-parallel">How efficiently does this summary convey information without unnecessary details or redundancy?</div>
+                            <div class="button-group" data-group="s1_conciseness">
+                                <button type="button" class="toggle-button" data-value="5">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">5 - Excellent</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="4">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">4 - Good</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="3">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">3 - Adequate</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="2">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">2 - Poor</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="1">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">1 - Very Poor</span>
+                                </button>
+                            </div>
+                            <input type="hidden" name="s1_conciseness" id="s1_conciseness" value="">
+                        </div>
+
+                        <!-- Summary 1: Faithfulness -->
+                        <div class="criteria-item">
+                            <div class="criteria-label-parallel">3. Faithfulness</div>
+                            <div class="criteria-description-parallel">How accurate is this summary? Does it contain errors or hallucinated information?</div>
+                            <div class="error-types-parallel">
+                                <strong>Common Error Types:</strong>
+                                <ul>
+                                    <li>Factual errors (incorrect facts)</li>
+                                    <li>Inference errors (incorrect conclusions)</li>
+                                    <li>Contradictions (contradicts the article)</li>
+                                    <li>Hallucinations (information not present)</li>
+                                </ul>
+                            </div>
+                            <div class="button-group" data-group="s1_faithfulness">
+                                <button type="button" class="toggle-button" data-value="5">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">5 - Excellent</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="4">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">4 - Good</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="3">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">3 - Adequate</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="2">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">2 - Poor</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="1">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">1 - Very Poor</span>
+                                </button>
+                            </div>
+                            <input type="hidden" name="s1_faithfulness" id="s1_faithfulness" value="">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary 2 Column -->
+                <div class="summary-column">
+                    <div class="summary-header">
+                        <div class="summary-header-title">Summary 2</div>
+                        <div class="summary-header-text">${summary2}</div>
+                    </div>
+
+                    <div class="evaluation-column">
+                        <!-- Summary 2: Completeness -->
+                        <div class="criteria-item">
+                            <div class="criteria-label-parallel">1. Completeness</div>
+                            <div class="criteria-description-parallel">How well does this summary capture the core messages and important information from the article?</div>
+                            <div class="button-group" data-group="s2_completeness">
+                                <button type="button" class="toggle-button" data-value="5">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">5 - Excellent</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="4">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">4 - Good</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="3">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">3 - Adequate</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="2">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">2 - Poor</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="1">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">1 - Very Poor</span>
+                                </button>
+                            </div>
+                            <input type="hidden" name="s2_completeness" id="s2_completeness" value="">
+                        </div>
+
+                        <!-- Summary 2: Conciseness -->
+                        <div class="criteria-item">
+                            <div class="criteria-label-parallel">2. Conciseness</div>
+                            <div class="criteria-description-parallel">How efficiently does this summary convey information without unnecessary details or redundancy?</div>
+                            <div class="button-group" data-group="s2_conciseness">
+                                <button type="button" class="toggle-button" data-value="5">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">5 - Excellent</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="4">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">4 - Good</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="3">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">3 - Adequate</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="2">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">2 - Poor</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="1">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">1 - Very Poor</span>
+                                </button>
+                            </div>
+                            <input type="hidden" name="s2_conciseness" id="s2_conciseness" value="">
+                        </div>
+
+                        <!-- Summary 2: Faithfulness -->
+                        <div class="criteria-item">
+                            <div class="criteria-label-parallel">3. Faithfulness</div>
+                            <div class="criteria-description-parallel">How accurate is this summary? Does it contain errors or hallucinated information?</div>
+                            <div class="error-types-parallel">
+                                <strong>Common Error Types:</strong>
+                                <ul>
+                                    <li>Factual errors (incorrect facts)</li>
+                                    <li>Inference errors (incorrect conclusions)</li>
+                                    <li>Contradictions (contradicts the article)</li>
+                                    <li>Hallucinations (information not present)</li>
+                                </ul>
+                            </div>
+                            <div class="button-group" data-group="s2_faithfulness">
+                                <button type="button" class="toggle-button" data-value="5">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">5 - Excellent</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="4">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">4 - Good</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="3">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">3 - Adequate</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="2">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">2 - Poor</span>
+                                </button>
+                                <button type="button" class="toggle-button" data-value="1">
+                                    <span class="toggle-button-indicator"></span>
+                                    <span class="toggle-button-text">1 - Very Poor</span>
+                                </button>
+                            </div>
+                            <input type="hidden" name="s2_faithfulness" id="s2_faithfulness" value="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: Overall Comparison -->
+            <div class="step-indicator">STEP 3</div>
+            <div class="section-header">Overall Comparison</div>
+
+            <div class="comparison-section">
+                <div class="comparison-title">Which summary is better overall?</div>
+                <p>Considering all three criteria (completeness, conciseness, and faithfulness), which summary do you prefer?</p>
+
+                <div class="button-group" data-group="overall_preference">
+                    <button type="button" class="toggle-button" data-value="s1_much_better">
+                        <span class="toggle-button-indicator"></span>
+                        <span class="toggle-button-text">Summary 1 is significantly better</span>
+                    </button>
+                    <button type="button" class="toggle-button" data-value="s1_better">
+                        <span class="toggle-button-indicator"></span>
+                        <span class="toggle-button-text">Summary 1 is somewhat better</span>
+                    </button>
+                    <button type="button" class="toggle-button" data-value="equal">
+                        <span class="toggle-button-indicator"></span>
+                        <span class="toggle-button-text">Both summaries are roughly equal in quality</span>
+                    </button>
+                    <button type="button" class="toggle-button" data-value="s2_better">
+                        <span class="toggle-button-indicator"></span>
+                        <span class="toggle-button-text">Summary 2 is somewhat better</span>
+                    </button>
+                    <button type="button" class="toggle-button" data-value="s2_much_better">
+                        <span class="toggle-button-indicator"></span>
+                        <span class="toggle-button-text">Summary 2 is significantly better</span>
+                    </button>
+                </div>
+                <input type="hidden" name="overall_preference" id="overall_preference" value="">
+            </div>
+
+            <!-- Optional Comments -->
+            <div class="comments-section">
+                <div class="comments-title">Additional Comments (Optional)</div>
+                <p>Please share any additional observations, reasoning for your choices, or feedback about the summaries.</p>
+                <crowd-text-area name="comments" rows="4" placeholder="Your comments here..."></crowd-text-area>
+            </div>
+
+        </div>
+    </crowd-form>
+
+    <script>
+        // Handle custom toggle button functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all button groups
+            const buttonGroups = document.querySelectorAll('.button-group');
+
+            buttonGroups.forEach(group => {
+                const groupName = group.getAttribute('data-group');
+                const buttons = group.querySelectorAll('.toggle-button');
+                const hiddenInput = document.getElementById(groupName);
+
+                buttons.forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+
+                        // Get the value from this button
+                        const value = this.getAttribute('data-value');
+
+                        // Remove selected class from all buttons in this group
+                        buttons.forEach(btn => {
+                            btn.classList.remove('selected');
+                        });
+
+                        // Add selected class to this button
+                        this.classList.add('selected');
+
+                        // Update the hidden input value
+                        if (hiddenInput) {
+                            hiddenInput.value = value;
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

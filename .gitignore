@@ -1,0 +1,5 @@
+__pycache__
+.venv
+rank_res
+secret.py
+tmp*/

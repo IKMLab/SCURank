@@ -1,0 +1,17 @@
+Compare the following summaries based on **information richness** (how much relevant detail is preserved) and **importance** (focus on the most significant points).
+
+For each summary, evaluate:
+- Information richness: Comprehensiveness, specific details, coverage of key topics
+- Importance: Focus on high-impact information, critical insights, actionable content
+
+Provide a brief analysis and rank the summaries from best to worst, explaining your reasoning.
+
+Input format:
+Article: [article text]
+Summary 1: [summary 1 text]
+Summary 2: [summary 2 text]
+
+Output format:
+Summary 1 Analysis: [Your analysis here]
+Summary 2 Analysis: [Your analysis here]
+Winner: [1 or 2 or "tie" if they are equally good]
