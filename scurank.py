@@ -3,8 +3,8 @@ from tqdm import tqdm
 import torch
 from nltk.tokenize import word_tokenize
 from sentence_transformers import SentenceTransformer
-from sklearn.cluster import HDBSCAN, AgglomerativeClustering, AffinityPropagation
-import warnings, os, umap, argparse
+from sklearn.cluster import HDBSCAN
+import warnings, os, argparse, string
 from utils import *
 
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -37,26 +37,14 @@ def _embedding(scus: list[list[str]], model: SentenceTransformer) -> tuple[list[
     return ids, points
 
 def clusterer(cluster_type) -> object:
-    if cluster_type == "hdbscan-umap":
-        return HDBSCAN(min_cluster_size=3, 
-                      min_samples=2,
-                      metric='correlation', 
-                      n_jobs=8, 
-                      allow_single_cluster=True,
-                      cluster_selection_epsilon=0.004, 
-                    )
-    elif cluster_type == "hdbscan":
+    if cluster_type == "hdbscan":
         return HDBSCAN(min_cluster_size=2,
-                       min_samples=2,
-                       metric='correlation',
-                       n_jobs=8,
-                       allow_single_cluster=True,
-                       cluster_selection_epsilon=0.15,
-                       )
-    elif cluster_type == "agglomerative":
-        return AgglomerativeClustering(n_clusters=None, distance_threshold=0.9, linkage='ward')
-    elif cluster_type == "affinity":
-        return AffinityPropagation(damping=0.7, preference=-20)
+                        min_samples=2,
+                        metric='correlation',
+                        n_jobs=8,
+                        allow_single_cluster=True,
+                        cluster_selection_epsilon=0.15,
+                        )
     else:
         raise ValueError(f"Unknown cluster type: {cluster_type}")
 
@@ -69,15 +57,11 @@ def _score(labels: list[int], ids: list[int], pl: list[float]) -> list[float]:
 
     scores = np.array(scores) / np.array(pl)
     return scores
-import string
+
 def __word_count(text: str) -> int:
     # Slowest but most accurate
     tokens = word_tokenize(text)
     words = [word for word in tokens if word not in string.punctuation]
-    # Moderate Method
-    # words = re.findall(r'\b\w+\b', text)
-    # Fastest but least accurate
-    # words = text.split()
     return len(words)
 
 def _penalty(candidates: list[str]) -> list[float]:
@@ -86,43 +70,30 @@ def _penalty(candidates: list[str]) -> list[float]:
     """
     return np.sqrt([__word_count(s) for s in candidates]).tolist()
 
-def scurank_raw(raw_data, cluster, emb_model, is_umap:bool=False, corrected_umap:umap.UMAP=None) -> list[int]:
+def scurank_raw(raw_data, cluster, emb_model) -> list[int]:
     ### check raw_data format
     if not isinstance(raw_data["candidates"], list):
         raw_data["candidates"] = list(raw_data["candidates"].values())
     if not isinstance(raw_data["scus"], list):
         raw_data["scus"] = list(raw_data["scus"].values())
-
-    # umap
-    if (is_umap == False) and (corrected_umap is not None):
-        print("Warning: is_umap is False but corrected_umap is provided. Using corrected_umap.")
-        is_umap = True
-    if corrected_umap is not None:
-        reducer = corrected_umap
-    else: 
-        reducer = umap.UMAP(n_neighbors=5, n_components=15, min_dist=0.2, metric='cosine')
     
     score = [0] * len(raw_data["candidates"])
     pl = _penalty(raw_data["candidates"])
     ids, points = _embedding(raw_data["scus"], emb_model)
     
-    if is_umap:
-        points = reducer.fit_transform(points)
     labels = cluster.fit(points).labels_.tolist()
     score = _score(labels, ids, pl)
     rank = (np.argsort(score)[::-1] + 1).tolist()
     return rank
 
-def scurank(data, cluster_type, emb_type = "all-mpnet-base-v2", is_generate_scus:bool = False, is_umap:bool = False, corrected_umap:umap.UMAP = None, corrected_cluster = None) -> list[list[int]]:
+def scurank(data, cluster_type, emb_type = "all-mpnet-base-v2", is_generate_scus:bool = False, corrected_cluster = None) -> list[list[int]]:
     """
     SCURank: Sentence Clustering for Unsupervised Ranking
     Args:
         data: list of raw data
-        cluster_type: type of clustering algorithm (hdbscan, agglomerative, affinity)
+        cluster_type: type of clustering algorithm (hdbscan)
         emb_type: type of embedding model
         is_generate_scus: whether to generate SCUs using OpenAI API
-        is_umap: whether to use UMAP for dimensionality reduction
-        corrected_umap: use own UMAP model (recommend to use when using the embedding model not in paper)
     """
     print("Loading embedding model...")
     emb_model = SentenceTransformer(emb_type, trust_remote_code=True, device="cuda" if torch.cuda.is_available() else "cpu")
@@ -140,15 +111,10 @@ def scurank(data, cluster_type, emb_type = "all-mpnet-base-v2", is_generate_scus
         if is_generate_scus:
             raw_data["scus"] = generate_scus(raw_data["candidates"])
             scus.append(raw_data["scus"])
-        rank = scurank_raw(raw_data, cluster, emb_model, is_umap, corrected_umap)
+        rank = scurank_raw(raw_data, cluster, emb_model)
         ranks.append(rank)
 
     if is_generate_scus: save_jsonl("scus.jsonl", scus)
-
-
-    # del emb_model
-    # gc.collect()
-    # torch.cuda.empty_cache()
     return ranks
 
 
@@ -186,7 +152,6 @@ if __name__ == "__main__":
     parser.add_argument("--cluster", type=str, default="hdbscan")
     parser.add_argument("--emb", type=str, default="all-mpnet-base-v2")
     parser.add_argument("--is_generate_scus", action="store_true")
-    parser.add_argument("--is_umap", action="store_true")
     parser.add_argument("--num", type=int, default=-1)
     args = parser.parse_args()
     main(args)
