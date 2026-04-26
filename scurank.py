@@ -151,7 +151,6 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--type", type=str, default="cnn_llms")
-    parser.add_argument("--scu_type", type=str, default="gpt")
     parser.add_argument("--cluster", type=str, default="hdbscan")
     parser.add_argument("--emb", type=str, default="all-mpnet-base-v2")
     parser.add_argument("--is_generate_scus", action="store_true")
