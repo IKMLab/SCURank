@@ -86,6 +86,7 @@ def batch_call_openai(ins:str, contents:list[str], model:str, path:str) -> None:
 
 
 def call_openai(ins:str = None, content:str = None, model:str="gpt-4o-mini",):
+    # gpt "5" series models do not support `max_tokens` and `temperature` parameters, so we set them in the prompt instead.
     client = build_openai_api()
     response = client.chat.completions.create(
         model=model,
@@ -95,7 +96,7 @@ def call_openai(ins:str = None, content:str = None, model:str="gpt-4o-mini",):
             {"role": "system", "content": ins},
             {"role": "user", "content": content},
         ],
-        max_tokens=512,
-        temperature=0.0,
+        # max_tokens=512,
+        # temperature=0.0,
     )
     return response.choices[0].message.content
