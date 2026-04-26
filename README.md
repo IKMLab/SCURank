@@ -29,15 +29,31 @@ uv sync
 - `scurank.py` — core SCURank ranking logic
 - `gen_scu.py` — batch SCU generation via LLM API calls
 - `pipeline.py` — end-to-end pipeline: summary generation → SCU extraction → ranking
-- `build_train_data.py` — converts ranking results into training data format
+- `build_train.py` — converts ranking results into training data format
 - `prompts/` — prompt templates used across the pipeline
 - `util/` — LLM backend integrations (OpenAI, Anthropic, Google Cloud)
 - `utils.py` — shared utilities for calling LLMs and loading/saving data
 - `experiments/` — all experimental results
-  - `distilled_model_output/` — outputs from models distilled using different ranking methods
+  - `distilled_model_output/` — outputs from models distilled using different ranking methods (one `.jsonl` per training run)
+    - `benchmark/` — reference summaries used for evaluation
+      - `refs_cnn.jsonl`, `refs_xsum.jsonl` — gold references for CNN/DailyMail and XSum
+    - `cnn_base/` — CNN distilled-model outputs trained on candidates from a single base model (5 runs per ranker: `bertscore`, `blanc`, `gptrank`, `mle`, `rouge`, `scurank`)
+    - `cnn_llms/` — CNN distilled-model outputs trained on candidates aggregated from multiple LLMs (same 6 rankers × 5 runs)
+    - `xsum/` — XSum distilled-model outputs (10 runs per ranker: `bert`, `blanc`, `gptrank`, `scurank`)
+    - `llms/` — raw candidate summaries from each source LLM (`gpt-4o`, `gpt-4o-mini`, `gpt-4-turbo`, `claude-3-5-sonnet`, `gemini-1.5-pro`, `gemini-1.5-flash`, `llama-3.1-70b/405b`, `mistral-large`), split into `cnn/` and `xsum/`
+    - `config.py` — BRIO training config; pair with a folder containing `train.jsonl` & `val.jsonl` and run via [`BRIO`](https://github.com/yixinl7/brio)
   - `human-compare/` — human evaluation comparing SCURank vs. GPTRank distilled models
-  - `llms-compare/` — LLM-based evaluation comparing SCURank vs. GPTRank distilled models
-  - `stability/` — stability comparison across LLM-based ranking methods
+    - `data/cnn_compare_file.jsonl`, `data/xsum_compare_file.jsonl` — paired summaries shown to annotators
+    - `data/rand/` — randomized batch CSVs (`cnn_batch.csv`, `xsum_batch.csv`, `merged_batch.csv`) for distributing to annotators
+    - `data/human_evaluation_results.csv` — collected annotator judgments
+    - `data_build.py` — builds the paired comparison files from distilled outputs
+    - `analysis.py` — aggregates results and computes win rates / agreement
+    - `template.html` — annotator UI shown for each pair
+  - `llms-compare/` — LLM-as-judge evaluation comparing SCURank vs. GPTRank distilled models
+    - `llm_compare.py` — runs the pairwise LLM judge
+    - `cnn_compare_gptrank_scurank_by_<judge>.txt`, `xsum_compare_gptrank_scurank_by_<judge>.txt` — win/loss/tie tallies from each judge (`claude-sonnet-4`, `gemini-2.5-pro`, `grok-4`)
+  - `stability/` — repeated-run stability comparison across ranking methods
+    - `scurank/`, `gptrank/`, `gptrank-rand/` — one subdir per method, each with `ranks.jsonl` (aggregated ranks) and `test-1/` … `test-5/` per-trial outputs (`rank-hdbscan.jsonl`, `scus.jsonl` for SCURank; analogous files for GPTRank variants)
 
 
 ## SCURank
@@ -147,12 +163,26 @@ uv run scurank.py --type cnn_llms --cluster hdbscan --emb all-mpnet-base-v2
 
 # Generate SCUs on the fly during ranking
 uv run scurank.py --type cnn_llms --cluster hdbscan --is_generate_scus
-
-# Use UMAP for dimensionality reduction before clustering
-uv run scurank.py --type cnn_llms --cluster hdbscan-umap --is_umap
 ```
 
-Available clustering algorithms: `hdbscan`, `hdbscan-umap`, `agglomerative`, `affinity`.
+We use `hdbscan` as the clustering algorithm in all reported experiments.
+
+---
+
+### 5. Building training data from ranks
+
+After ranking, convert the rank results into the BRIO-compatible training format with `build_train.py`. Each output line contains an `article`, the top-ranked `abstract`, and the remaining `candidates` paired with their scores — ready to feed into [`BRIO`](https://github.com/yixinl7/brio) using the configs in [experiments/distilled_model_output/config.py](experiments/distilled_model_output/config.py).
+
+```bash
+# SCURank ranks → train.jsonl / val.jsonl
+uv run build_train.py --data_type cnn_llms --rank_type scurank \
+    --cluster_type hdbscan --emb_type all-mpnet-base-v2 --nums 1 2 3 4 5
+
+# GPTRank ranks → train.jsonl / val.jsonl
+uv run build_train.py --data_type cnn_llms --rank_type gptrank --nums 1 2 3 4 5
+```
+
+Inputs are read from `rank_res/<data_type>/<rank_type>/...` and outputs are written alongside them. The two builders handle the format difference noted in the next section (GPTRank's ordered-index list vs. SCURank's per-candidate rank scores).
 
 
 ## Additional Notes
