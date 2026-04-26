@@ -1,6 +1,7 @@
 import numpy as np
 from tqdm import tqdm
 import torch
+import nltk
 from nltk.tokenize import word_tokenize
 from sentence_transformers import SentenceTransformer
 from sklearn.cluster import HDBSCAN
@@ -9,6 +10,8 @@ from utils import *
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
+
+nltk.download('punkt_tab')
 
 """
 default data type: list[dict{"article", "candidates": {dict[str]}, "scus": {dict[list[str]]}}]
