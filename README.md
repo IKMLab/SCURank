@@ -1,8 +1,16 @@
 SCURank
 ===
 
-This repository contains the code, data, and experiments for our paper: **SCURank: Ranking Multiple Candidate Summaries with Summary Content Units for Enhanced Summarization**
+[![Paper](https://img.shields.io/badge/Paper-ACL%202026%20Findings-blue)](https://aclanthology.org/2026.findings-acl.1941/)
+[![PDF](https://img.shields.io/badge/PDF-Download-red)](https://aclanthology.org/2026.findings-acl.1941.pdf)
 
+Official implementation of the Findings of ACL 2026 paper:
+
+> **SCURank: Ranking Multiple Candidate Summaries with Summary Content Units for Enhanced Summarization**
+>
+> **Bo-Jyun Wang**, Ying-Jia Lin, and Hung-Yu Kao
+>
+> Findings of the Association for Computational Linguistics: ACL 2026
 
 ## Overview
 
@@ -204,6 +212,19 @@ The two methods use different rank result conventions.
 ```
 
 Use `build_train_data.py` to convert either format into a unified training data structure.
+
+## Citation
+
+If you find this repository useful, please cite our paper:
+
+```bibtex
+@inproceedings{wang-etal-2026-scurank,
+  title = {SCURank: Ranking Multiple Candidate Summaries with Summary Content Units for Enhanced Summarization},
+  author = {Wang, Bo-Jyun and Lin, Ying-Jia and Kao, Hung-Yu},
+  booktitle = {Findings of the Association for Computational Linguistics: ACL 2026},
+  year = {2026}
+}
+```
 
 <!-- 
 ### 2. Start to use Google Cloud
