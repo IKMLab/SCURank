@@ -218,11 +218,12 @@ Use `build_train_data.py` to convert either format into a unified training data 
 If you find this repository useful, please cite our paper:
 
 ```bibtex
-@inproceedings{wang-etal-2026-scurank,
-  title = {SCURank: Ranking Multiple Candidate Summaries with Summary Content Units for Enhanced Summarization},
-  author = {Wang, Bo-Jyun and Lin, Ying-Jia and Kao, Hung-Yu},
-  booktitle = {Findings of the Association for Computational Linguistics: ACL 2026},
-  year = {2026}
+@inproceedings{wang2026scurank,
+  title={SCURank: Ranking Multiple Candidate Summaries with Summary Content Units for Enhanced Summarization},
+  author={Wang, Bo-Jyun and Lin, Ying-Jia and Kao, Hung-Yu},
+  booktitle={Findings of the Association for Computational Linguistics: ACL 2026},
+  pages={38980--38997},
+  year={2026}
 }
 ```
 
